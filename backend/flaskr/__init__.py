@@ -188,10 +188,9 @@ def create_app(test_config=None):
     categories in the left column will cause only questions of that
     category to be shown.
     '''
-
     @app.route('/categories/<int:cat_id>/questions', methods=['GET'])
     def get_cat_questions(cat_id):
-        questions = Question.query.filter(Question.category==cat_id).all()
+        questions = Question.query.filter(Question.category == cat_id).all()
         current_questions = paginate_questions(request, questions)
 
         return jsonify({
@@ -200,7 +199,6 @@ def create_app(test_config=None):
             'total_questions': len(current_questions),
             'current_category': cat_id
         })
-
 
     '''
     @TODO:
@@ -213,11 +211,65 @@ def create_app(test_config=None):
     one question at a time is displayed, the user is allowed to answer
     and shown whether they were correct or not.
     '''
+    @app.route('/quizzes', methods=['POST'])
+    def next_question():
+        body = request.get_json()
+        prev_questions = body.get('previous_questions')
+        category = body.get('quiz_category')['id']
+
+        if category == 0:
+            # all category
+            questions = Question.query.all()
+        else:
+            questions = Question.query.filter(
+                Question.category == category).all()
+
+        if len(prev_questions) == len(questions):
+            # no more questions
+            return jsonify({
+                'success': True
+            })
+
+        def next_random_question():
+            q = questions[random.randint(0, len(questions)-1)]
+
+            while q.id in prev_questions:
+                q = questions[random.randint(0, len(questions)-1)]
+            return q
+
+        return jsonify({
+            'success': True,
+            'question': next_random_question().format(),
+        })
 
     '''
     @TODO:
     Create error handlers for all expected errors
     including 404 and 422.
     '''
+
+    @app.errorhandler(400)
+    def bad_request(error):
+        return jsonify({
+            'success': False,
+            'error': 400,
+            'message': 'bad_request'
+        }), 400
+
+    @app.errorhandler(404)
+    def not_found(error):
+        return jsonify({
+            'success': False,
+            'error': 404,
+            'message': 'resource not found'
+        }), 404
+
+    @app.errorhandler(422)
+    def unprocessable(error):
+        return jsonify({
+            'success': False,
+            'error': 422,
+            'message': 'unprocessable'
+        }), 422
 
     return app

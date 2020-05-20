@@ -71,6 +71,16 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['deleted'], question.id)
 
 
+    def test_delete_nonexist_question(self):
+
+        res = self.client().delete('/questions/100000')
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 422)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'unprocessable')
+
+
     def test_submit_question(self):
 
         res = self.client().post('/questions', json=self.new_question)
