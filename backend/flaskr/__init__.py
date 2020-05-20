@@ -178,7 +178,7 @@ def create_app(test_config=None):
     Try using the word "title" to start.
     '''
 
-    # @app.route('/questions', methods=['POST'])
+    # above =========
 
     '''
     @TODO:
@@ -188,6 +188,20 @@ def create_app(test_config=None):
     categories in the left column will cause only questions of that
     category to be shown.
     '''
+
+    @app.route('/categories/<int:cat_id>/questions', methods=['GET'])
+    def get_cat_questions(cat_id):
+        questions = Question.query.filter(Question.category==cat_id).all()
+        current_questions = paginate_questions(request, questions)
+
+        return jsonify({
+            'success': True,
+            'questions': current_questions,
+            'total_questions': len(current_questions),
+            'current_category': cat_id
+        })
+
+
     '''
     @TODO:
     Create a POST endpoint to get questions to play the quiz.
