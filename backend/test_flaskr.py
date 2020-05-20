@@ -43,6 +43,7 @@ class TriviaTestCase(unittest.TestCase):
     """
 
     def test_get_paginated_questions(self):
+
         res = self.client().get('/questions')
         data = json.loads(res.data)
 
@@ -78,6 +79,18 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
         self.assertTrue(data['created'])
+
+
+    def test_search_question(self):
+        res = self.client().post('/questions', json=self.new_question)
+
+        res = self.client().post('/questions', json={'searchTerm':"actor"})
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertEqual(data['total_questions'], 1)
+        
 
 
 

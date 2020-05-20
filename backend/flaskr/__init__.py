@@ -94,9 +94,10 @@ def create_app(test_config=None):
     '''
     @app.route('/questions/<int:question_id>', methods=['DELETE'])
     def delete_question(question_id):
-        try: 
+        try:
 
-            question = Question.query.filter(Question.id == question_id).one_or_none()
+            question = Question.query.filter(
+                Question.id == question_id).one_or_none()
 
             if question is None:
                 abort(404)
@@ -109,7 +110,6 @@ def create_app(test_config=None):
             })
         except:
             abort(422)
-
 
     '''
     @TODO:
@@ -125,33 +125,47 @@ def create_app(test_config=None):
     @app.route('/questions', methods=['POST'])
     def submit_question():
         body = request.get_json()
-
-        new_question = body.get('question')
-        new_answer = body.get('answer')
-        new_difficulty = body.get('difficulty')
-        new_category = body.get('category')
+        search = body.get('searchTerm', None)
 
         try:
-            question = Question(
-                question = new_question,
-                answer = new_answer,
-                category = new_category,
-                difficulty = new_difficulty
-            )
-            question.insert()
+            if search:
+                # search
+                selection = Question.query.filter(
+                    Question.question.ilike('%{}%'.format(search)))
+                current_questions = paginate_questions(request, selection)
 
-            questions = Question.query.all()
-            current_questions = paginate_questions(request, questions)
+                return jsonify({
+                    'success': True,
+                    'questions': current_questions,
+                    'total_questions': len(current_questions),
+                    'current_category': None
+                })
+            else:
+                # post question
+                new_question = body.get('question')
+                new_answer = body.get('answer')
+                new_difficulty = body.get('difficulty')
+                new_category = body.get('category')
 
-            return jsonify({
-                'success': True,
-                'questions': current_questions,
-                'total_questions': len(questions),
-                'created': question.id
-            })
+                question = Question(
+                    question=new_question,
+                    answer=new_answer,
+                    category=new_category,
+                    difficulty=new_difficulty
+                )
+                question.insert()
+
+                questions = Question.query.all()
+                current_questions = paginate_questions(request, questions)
+
+                return jsonify({
+                    'success': True,
+                    'questions': current_questions,
+                    'total_questions': len(questions),
+                    'created': question.id
+                })
         except:
             abort(422)
-
 
     '''
     @TODO:
@@ -163,6 +177,8 @@ def create_app(test_config=None):
     only question that include that string within their question.
     Try using the word "title" to start.
     '''
+
+    # @app.route('/questions', methods=['POST'])
 
     '''
     @TODO:
