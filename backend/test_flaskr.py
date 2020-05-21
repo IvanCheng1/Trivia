@@ -26,6 +26,14 @@ class TriviaTestCase(unittest.TestCase):
             'category': 1
         }
 
+        # sample incomplete question
+        self.incomplete_question = {
+            'question': "",
+            'answer': "",
+            'difficulty': 1,
+            'category': 1
+        }
+
         # binds the app to the current context
         with self.app.app_context():
             self.db = SQLAlchemy()
@@ -49,7 +57,37 @@ class TriviaTestCase(unittest.TestCase):
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-    
+
+
+    def test_get_nonexist_questions(self):
+
+        res = self.client().get('/questions?page=50000')
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 404)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'resource not found')
+        
+
+    def test_get_category_questions(self):
+
+        res = self.client().get('/categories/1/questions')
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(data['current_category'])
+        self.assertTrue(data['total_questions'])
+
+
+    def test_get_nonexist_category_questions(self):
+
+        res = self.client().get('/categories/1000000/questions')
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 404)
+        self.assertEqual(data['success'], False)
+
 
     def test_delete_question(self):
 
@@ -63,7 +101,6 @@ class TriviaTestCase(unittest.TestCase):
         question.insert()
 
         res = self.client().delete('/questions/{}'.format(question.id))
-        # res = self.client().delete('/questions/1000')
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 200)
@@ -91,8 +128,16 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(data['created'])
 
 
+    def test_submit_incomplete_question(self):
+
+        res = self.client().post('/questions', json=self.incomplete_question)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 422)
+        self.assertEqual(data['success'], False)
+
+
     def test_search_question(self):
-        res = self.client().post('/questions', json=self.new_question)
 
         res = self.client().post('/questions', json={'searchTerm':"actor"})
         data = json.loads(res.data)
@@ -101,8 +146,6 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], True)
         self.assertEqual(data['total_questions'], 1)
         
-
-
 
 # Make the tests conveniently executable
 if __name__ == "__main__":

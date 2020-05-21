@@ -147,6 +147,9 @@ def create_app(test_config=None):
                 new_difficulty = body.get('difficulty')
                 new_category = body.get('category')
 
+                if new_question == "" or new_answer == "" or new_difficulty == "" or new_category == "":
+                    abort(422)
+
                 question = Question(
                     question=new_question,
                     answer=new_answer,
@@ -191,6 +194,10 @@ def create_app(test_config=None):
     @app.route('/categories/<int:cat_id>/questions', methods=['GET'])
     def get_cat_questions(cat_id):
         questions = Question.query.filter(Question.category == cat_id).all()
+
+        if len(questions) == 0:
+            abort(404)
+
         current_questions = paginate_questions(request, questions)
 
         return jsonify({
