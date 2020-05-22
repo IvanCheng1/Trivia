@@ -75,7 +75,7 @@ The API will return three error types when requests fail:
 
 * [GET /categories](#get-categories)
 * [GET /questions](#get-questions)
-* [DELETE /questions/<int:question_id>](#delete-questionsintquestion_id)
+* [DELETE /questions/int:question_id](#delete-questionsintquestion_id)
 * [POST /questions](#post-questions)
 * [GET /categories/int:cat_id/questions](#get-categoriesintcat_idquestions)
 * [POST /quizzes](#post-quizzes)
@@ -208,9 +208,7 @@ The API will return three error types when requests fail:
 
 #### POST /questions
 
-Either returns search results or creates a new question.
-* [Search](#search)
-* [Post](#post)
+Either returns [search results](#search) or [creates a new question](#post).
 
 ##### Search
 
