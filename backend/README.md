@@ -73,8 +73,12 @@ The API will return three error types when requests fail:
 
 ## Endpoints
 
-* [GET /categories](#GET-/categories)
-* [Contributing](#contributing)
+* [GET /categories](#get-categories)
+* [GET /questions](#get-questions)
+* [DELETE /questions/<int:question_id>](#delete-questionsintquestion_id)
+* [POST /questions](#post-questions)
+* [GET /categories/int:cat_id/questions](#get-categoriesintcat_idquestions)
+* [POST /quizzes](#post-quizzes)
 
 #### GET /categories
 
@@ -204,7 +208,9 @@ The API will return three error types when requests fail:
 
 #### POST /questions
 
-Either returns search results or creates a new question
+Either returns search results or creates a new question.
+* [Search](#search)
+* [Post](#post)
 
 ##### Search
 
