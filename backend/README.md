@@ -73,7 +73,7 @@ The API will return three error types when requests fail:
 
 ## Endpoints
 
-* [GET /categories](#endpoints)
+* [GET /categories](#GET-/categories)
 * [Contributing](#contributing)
 
 #### GET /categories
